@@ -1,0 +1,164 @@
+syntax = "proto3";
+
+package v1;
+
+//option go_package = "procedures.v1";
+
+import "google/protobuf/timestamp.proto";
+
+enum ProcedureActionType 
+{
+    None = 0;
+    PrintLog = 1;
+    DispatchForces = 2;
+}
+
+message ProcedureStepResult
+{
+    int32 procedureStepResultID = 1;
+    int32 sequenceNumber = 2;
+    string name = 3;
+}
+
+message ProcedureAction
+{
+    string name = 1;
+    int32 procedureActionId = 2;
+    int32 procedureStepId = 3;
+    ProcedureActionType actionType = 4;
+    string actionParams = 5;
+    bool isAutomatic = 6;
+}
+
+message ProcedureStep 
+{
+    int32 procedureStepID = 1;
+    int32 sequenceNumber = 2;
+    string title = 3;
+    string intruction = 4;
+    repeated ProcedureStepResult possibleResults = 5;
+    ProcedureAction procedureAction = 6;
+}
+
+message ProcedureCondition
+{
+    int32 eventTypeId = 1;
+    int32 severity = 2;
+    int32 priority = 3;
+    google.protobuf.Timestamp startAt = 4;
+    google.protobuf.Timestamp endAt = 5;
+}
+
+message ProcedureSchedule 
+{
+    int32 recurrenceType = 1;
+    google.protobuf.Timestamp startAt = 2;
+    google.protobuf.Timestamp endAt = 3;
+    string recurrenceValues = 4;
+    int64 duration = 5;
+}
+
+message ProcedureTemplate
+{
+    string procedureId = 1;
+    string name = 2;
+    string description = 3;
+    google.protobuf.Timestamp creationDate = 4;
+    google.protobuf.Timestamp modifyDate = 5;
+    google.protobuf.Timestamp validityDate = 6;
+    int32 creatingUserId = 7;
+    int32 modifyUserId = 8;
+    bool isActive = 9;
+    bool isDeleted = 10;
+    ProcedureCondition condition = 11;
+    string geoArea = 12;
+    ProcedureSchedule schedule = 13;
+    repeated ProcedureStep steps = 14;
+}
+
+message CreateProcedureRequest
+{
+    ProcedureTemplate procedureTemplate = 1;
+}
+
+message CreateProcedureResponse
+{
+
+}
+
+message UpdateProcedureRequest
+{
+    ProcedureTemplate procedureTemplate = 1;
+}
+
+message UpdateProcedureResponse
+{
+
+}
+
+message DeleteProcedureRequest
+{
+    string procedureId = 1;
+}
+
+message DeleteProcedureResponse
+{
+
+}
+
+message LockProcedureRequest
+{
+    string procedureId = 1;
+    int32 userId = 2;
+    bool isLocked = 3;
+}
+
+message LockProcedureResponse
+{
+
+}
+
+message GetProceduresRequest
+{
+    int32 from = 1;
+    int32 take = 2;
+    repeated string filterByIds = 3;
+    int32 filterByEventTypeId = 4;
+    int32 filterByEventSeverity = 5;
+}
+
+message GetProceduresResponse
+{
+    repeated ProcedureTemplate procedures = 1;
+}
+ 
+service ProcedureService
+{
+    rpc GetProcedures(GetProceduresRequest) returns (GetProceduresResponse);
+    rpc CreateProcedure(CreateProcedureRequest) returns (CreateProcedureResponse);
+    rpc UpdateProcedure(UpdateProcedureRequest) returns (UpdateProcedureResponse);
+    rpc DeleteProcedure(DeleteProcedureRequest) returns (DeleteProcedureResponse);
+    rpc LockProcedure(LockProcedureRequest) returns (LockProcedureResponse);
+}
+
+message ProcedureAdded
+{
+    ProcedureTemplate procedureTemplate = 1;
+}
+
+message ProcedureUpdated
+{
+    ProcedureTemplate procedureTemplate = 1;
+}
+
+message ProcedureDeleted
+{
+    string procedureId = 1;
+}
+
+message ProcedureLocked
+{
+    string procedureId = 1;
+    int32 userId = 2;
+    bool isLocked = 3;
+}
